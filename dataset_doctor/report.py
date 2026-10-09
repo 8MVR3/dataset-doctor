@@ -111,12 +111,15 @@ def _example_html(ex: Example, root) -> str:
 
 
 def _verdict(findings: list[Finding]) -> tuple[str, str]:
+    from .checks import plural
+
     crit = sum(1 for f in findings if f.severity == CRITICAL)
     warn = sum(1 for f in findings if f.severity == WARNING)
     if crit:
-        return "bad", f"Перед обучением нужно исправить {crit} критичных проблем{'у' if crit == 1 else ''}: иначе модель будет учиться на ошибках, а метрики окажутся неправдивыми."
+        return "bad", (f"Перед обучением нужно исправить {plural(crit, 'критичную проблему', 'критичные проблемы', 'критичных проблем')}: "
+                       "иначе модель будет учиться на ошибках, а метрики окажутся неправдивыми.")
     if warn:
-        return "mid", f"Критичных проблем нет. Есть {warn} замечани{'е' if warn == 1 else 'й' if warn >= 5 else 'я'}, которые стоит разобрать."
+        return "mid", f"Критичных проблем нет, но есть {plural(warn, 'замечание', 'замечания', 'замечаний')}. Подробности ниже."
     return "good", "Проблем не найдено: датасет можно отдавать в обучение."
 
 
